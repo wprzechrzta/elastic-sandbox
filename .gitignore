@@ -1,2 +1,7 @@
 elastic
 elastic/data
+
+data/
+data
+
+.env
