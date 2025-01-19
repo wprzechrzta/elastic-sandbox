@@ -16,10 +16,6 @@ docker-compose down
 
 
 
-
-
-
-
 http://localhost:5601/ - Kibana Web UI interface
 http://localhost:9200/ - Elastic Search API
 
@@ -206,6 +202,9 @@ see stats: aggregations/popular_in_entertainment/buckets
 show frequency of terms in this field
 
 ## Precision and Recall
+doens't take proximity into account between terms
+  order is not impotant
+
 GET enter_name_of_index_here/_search
 {
   "query": {
@@ -276,7 +275,8 @@ GET enter_name_of_index_here/_search
 }
 
 - at least 3 terms must match
-
+  doens't take proximity into account between terms
+  order is not impotant
 GET news_headlines/_search
 {
   "query": {
@@ -289,6 +289,196 @@ GET news_headlines/_search
   }
 }
 
-# Matching query and match_phrase query
+# Matching query and match_phrase query - match_phrase
 https://www.youtube.com/watch?v=lTI4wsQKilI&list=PL_mJOmq4zsHbcdoeAwNWuhEWwDARMMBta&index=11
 
+- queries
+https://github.com/LisaHJung/Part-3-Running-full-text-queries-and-combined-queries-with-Elasticsearch-and-Kibana?tab=readme-ov-file#full-text-queries
+
+- filtering
+- sponsored entity
+- not-exacly match
+
+!!!! you want to search for phrases...
+
+GET news_headlines/_search
+{
+  "query": {
+    "match": {
+      "headline": {
+        "query": "Shape of you"
+      }
+    }
+  }
+}
+
+Searching for phrases using the match_phrase query
+If the order and the proximity in which the search terms are found(i.e. phrases) are important in determining the relevance of your search, you use the match_phrase query.
+
+GET Enter_name_of_index_here/_search
+{
+  "query": {
+    "match_phrase": {  # see here
+      "Specify the field you want to search": {
+        "query": "Enter search terms"
+      }
+    }
+  }
+}
+
+GET news_headlines/_search
+{
+  "query": {
+    "match_phrase": {
+      "headline": {
+        "query": "Shape of You"
+      }
+    }
+  }
+}
+
+
+# Multi-match query
+Running a match query against multiple fields
+search mutliple fields at the same time
+The multi_match query runs a match query on multiple fields and calculates a score for each field. Then, it assigns the highest score among the fields to the document.
+
+This score will determine the ranking of the document within the search results.
+
+GET Enter_the_name_of_the_index_here/_search
+{
+  "query": {
+    "multi_match": {
+      "query": "Enter search terms here",
+      "fields": [
+        "List the field you want to search over",
+        "List the field you want to search over",
+        "List the field you want to search over"
+      ]
+    }
+  }
+}
+
+GET Enter_the_name_of_the_index_here/_search
+{
+  "query": {
+    "multi_match": {
+      "query": "Enter search terms here",
+      "fields": [
+        "List the field you want to search over",
+        "List the field you want to search over",
+        "List the field you want to search over"
+      ]
+    }
+  }
+}
+
+Example:
+The following multi_match query asks Elasticsearch to query documents that contain the search terms "Michelle" or "Obama" in the fields headline, or short_description, or authors.
+
+GET news_headlines/_search
+{
+  "query": {
+    "multi_match": {
+      "query": "Michelle Obama",
+      "fields": [
+        "headline",
+        "short_description",
+        "authors"
+      ]
+    }
+  }
+}
+
+
+## Per-field boosting
+
+Headlines mentioning "Michelle Obama" in the field headline are more likely to be related to our search than the headlines that mention "Michelle Obama" once or twice in the field short_description.
+
+To improve the precision of your search, you can designate one field to carry more weight than the others.
+
+This can be done by boosting the score of the field headline(per-field boosting). This is notated by adding a carat(^) symbol and number 2 to the desired field as shown below.
+
+
+GET Enter_the_name_of_the_index_here/_search
+{
+  "query": {
+    "multi_match": {
+      "query": "Enter search terms",
+      "fields": [
+        "List field you want to boost^2",
+        "List field you want to search over",
+        "List field you want to search over"
+      ]
+    }
+  }
+}
+
+Example: 
+GET news_headlines/_search
+{
+  "query": {
+    "multi_match": {
+      "query": "Michelle Obama",
+      "fields": [
+        "headline^2",
+        "short_description",
+        "authors"
+      ]
+    }
+  }
+}
+
+
+GET news_headlines/_search
+{
+  "query": {
+    "multi_match": {
+      "query": "party planning",
+      "fields": [
+        "headline^2",
+        "short_description"
+      ]
+    }
+  }
+}
+- see
+https://github.com/LisaHJung/Part-3-Running-full-text-queries-and-combined-queries-with-Elasticsearch-and-Kibana?tab=readme-ov-file#full-text-queries
+
+## mproving precision with phrase type match
+You can improve the precision of a multi_match query by adding the "type":"phrase" to the query.
+
+The phrase type performs a match_phrase query on each field and calculates a score for each field. Then, it assigns the highest score among the fields to the document.
+
+GET Enter_the_name_of_the_index_here/_search
+{
+  "query": {
+    "multi_match": {
+      "query": "Enter search phrase",
+      "fields": [
+        "List field you want to boost^2",
+        "List field you want to search over",
+        "List field you want to search over"
+      ],
+      "type": "phrase"
+    }
+  }
+}
+
+Using per field boosting, this query assigns a higher score to documents containing the phrase "party planning" in the field headline. The documents that include the phrase "party planning" in the field headline will be ranked higher in the search results.
+
+GET news_headlines/_search
+{
+  "query": {
+    "multi_match": {
+      "query": "party planning",
+      "fields": [
+        "headline^2",
+        "short_description"
+      ],
+      "type": "phrase"
+    }
+  }
+}
+
+The recall is much lower(6 vs 2846 hits) but every one of the hits have the phrase "party planning" in either the field headline or short_description or both.
