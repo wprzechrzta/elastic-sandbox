@@ -14,9 +14,6 @@ docker-compose logs kibana
 
  # password in .env
 
-# workshop
-https://github.com/LisaHJung/Part-1-Intro-to-Elasticsearch-and-Kibana
-
 
  # Running
 

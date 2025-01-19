@@ -15,9 +15,7 @@ docker-compose down -v
 docker-compose down
 
 
-## Workshop repo
-- part-1
-https://github.com/LisaHJung/Part-1-Intro-to-Elasticsearch-and-Kibana
+
 
 
 
@@ -89,8 +87,6 @@ GET favorite_candy/_search
   dataset: 
   https://www.kaggle.com/datasets/rmisra/news-category-dataset
 
-  - all resources: 
-  https://github.com/LisaHJung/Part-2-Understanding-the-relevance-of-your-search-with-Elasticsearch-and-Kibana-?tab=readme-ov-file
 
   Example:
   Import data from https://www.kaggle.com/datasets/rmisra/news-category-dataset using kibana FileVisualizer in Kibana/home/ingest section/fileUpload
@@ -99,7 +95,7 @@ GET favorite_candy/_search
 
 # Basic search
   kibana/dev_console: 
-  > GET news_headline/_search
+  > GET news_headlines/_search
 
 
 # Get the exact total number of hits
@@ -185,7 +181,7 @@ GET enter_name_of_the_index_here/_search
   }
 }
 
-GET news_headline/_search
+GET news_headlines/_search
 {
   "query": {
     "match": {
