@@ -129,6 +129,9 @@ GET news_headlines/_search
   }
 }
 
+# Discover  what categories are there?
+aggregation - is type of search to get summary about data
+
 # Aggregations
  if you want to discover categories form given field?
  GET enter_name_of_the_index_here/_search
@@ -149,8 +152,8 @@ GET news_headlines/_search
   "aggs": {
     "by_category": {
       "terms": {
-        "field": "category",
-        "size": 100
+        "field": "category", # pull unique values form this field
+        "size": 100 # limit values up to 100
       }
     }
   }
@@ -197,4 +200,95 @@ GET news_headlines/_search
   }
 }
 
+
+see stats: aggregations/popular_in_entertainment/buckets
+
+show frequency of terms in this field
+
+## Precision and Recall
+GET enter_name_of_index_here/_search
+{
+  "query": {
+    "match": {
+      "Specify the field you want to search": {
+        "query": "Enter search terms"
+      }
+    }
+  }
+}
+
+- find docs matching field "headline"
+  match when at least one term is inluded
+GET news_headlines/_search
+{
+  "query": {
+    "match": {
+      "headline": {
+        "query": "Khloe Kardashian Kendall Jenner" # OR logic applied
+      }
+    }
+  }
+}
+
+## ncreasing Precision
+We can increase precision by adding an "and" operator to the query.
+
+GET enter_name_of_index_here/_search
+{
+  "query": {
+    "match": {
+      "Specify the field you want to search": {
+        "query": "Enter search terms",
+        "operator": "and"
+      }
+    }
+  }
+}
+
+GET news_headlines/_search
+{
+  "query": {
+    "match": {
+      "headline": {
+        "query": "Khloe Kardashian Kendall Jenner",
+        "operator": "and"
+      }
+    }
+  }
+}
+
+- minimum_should_match
+
+This parameter allows you to specify the minimum number of terms a document should have to be included in the search results.
+
+This parameter gives you more control over fine tuning precision and recall of your search.
+
+GET enter_name_of_index_here/_search
+{
+  "query": {
+    "match": {
+      "headline": {
+        "query": "Enter search term here",
+        "minimum_should_match": Enter a number here
+      }
+    }
+  }
+}
+
+- at least 3 terms must match
+
+GET news_headlines/_search
+{
+  "query": {
+    "match": {
+      "headline": {
+        "query": "Khloe Kardashian Kendall Jenner",
+        "minimum_should_match": 3
+      }
+    }
+  }
+}
+
+# Matching query and match_phrase query
+https://www.youtube.com/watch?v=lTI4wsQKilI&list=PL_mJOmq4zsHbcdoeAwNWuhEWwDARMMBta&index=11
 

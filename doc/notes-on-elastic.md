@@ -124,4 +124,11 @@ precision vs recall  this are fighting with each other
   > GET news_headline/_search
 
   ## Exploring data
-  
+@see runbook  
+
+
+## Fine-tunning precision or recall fo a match query
+precision - want less results but good matched
+recall - get more results, exact match is not important
+
+https://github.com/LisaHJung/Part-2-Understanding-the-relevance-of-your-search-with-Elasticsearch-and-Kibana-?tab=readme-ov-file#precision-and-recall
