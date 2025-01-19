@@ -1,9 +1,25 @@
 
+## install
+- docker
+ https://github.com/LisaHJung/Part-1-Intro-to-Elasticsearch-and-Kibana/blob/main/docker-compose-directions.md
+
 # Start kibana and elasticsearch 
 use docker-compose-single.yml
 
+docker-compose up -d
+
+docker compose logs
+docker compose ps
+
+docker-compose down -v
+docker-compose down
+
+
 ## Workshop repo
+- part-1
 https://github.com/LisaHJung/Part-1-Intro-to-Elasticsearch-and-Kibana
+
+
 
 
 http://localhost:5601/ - Kibana Web UI interface
