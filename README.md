@@ -24,6 +24,12 @@ https://github.com/LisaHJung/Part-1-Intro-to-Elasticsearch-and-Kibana
 - part-3
   https://github.com/LisaHJung/Part-3-Running-full-text-queries-and-combined-queries-with-Elasticsearch-and-Kibana
 
+- part 4
+  https://github.com/LisaHJung/Part-4-Running-Aggregations-with-Elasticsearch-and-Kibana
+
 - miniseries youtube:
   https://github.com/LisaHJung/Beginners-Crash-Course-to-Elastic-Stack-Series-Table-of-Contents
 
+
+
+## Data

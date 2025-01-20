@@ -763,3 +763,147 @@ GET news_headlines/_search
 }
 
 ## Aggregation
+https://github.com/LisaHJung/Part-4-Running-Aggregations-with-Elasticsearch-and-Kibana
+
+https://www.youtube.com/watch?v=2UPtZPGUJmI&list=PL_mJOmq4zsHbcdoeAwNWuhEWwDARMMBta&index=18
+## Metrics aggregations
+
+GET Enter_name_of_the_index_here/_search
+{
+  "aggs": {
+    "Name your aggregations here": {
+      "Specify the aggregation type here": {
+        "field": "Name the field you want to aggregate on here"
+      }
+    }
+  }
+}
+
+### Metric Aggregations
+Metricaggregations are used to compute numeric values based on your dataset. It can be used to calculate the values of sum,min, max, avg, unique count(cardinality) and etc.
+
+Compute the sum of all unit prices in the index
+GET Enter_name_of_the_index_here/_search
+{
+  "aggs": {
+    "Name your aggregations here": {
+      "sum": {
+        "field": "Name the field you want to aggregate on here"
+      }
+    }
+  }
+}
+
+
+GET ecommerce_data/_search
+{
+  "aggs": {
+    "sum_unit_price": {
+      "sum": {
+        "field": "UnitPrice"
+      }
+    }
+  }
+}
+
+## Using size param to not return hits, only aggragation
+ the purpose of running an aggregation is solely to get the aggregations results, you can add a size parameter and set it to 0 as shown below. This parameter prevents Elasticsearch from fetching the top 10 hits so that the aggregations results are shown at the top of the response.
+
+ GET ecommerce_data/_search
+{
+  "size": 0,
+  "aggs": {
+    "sum_unit_price": {
+      "sum": {
+        "field": "UnitPrice"
+      }
+    }
+  }
+}
+
+Compute the lowest(min) unit price of an item
+
+
+GET ecommerce_data/_search
+{
+  "size": 0,
+  "aggs": {
+    "lowest_unit_price": {
+      "min": {
+        "field": "UnitPrice"
+      }
+    }
+  }
+}
+
+
+Compute the highest(max) unit price of an item
+
+GET ecommerce_data/_search
+{
+  "size": 0,
+  "aggs": {
+    "highest_unit_price": {
+      "max": {
+        "field": "UnitPrice"
+      }
+    }
+  }
+}
+
+Average
+
+GET ecommerce_data/_search
+{
+  "size": 0,
+  "aggs": {
+    "average_unit_price": {
+      "avg": {
+        "field": "UnitPrice"
+      }
+    }
+  }
+}
+
+All stats in one go
+
+GET ecommerce_data/_search
+{
+  "size": 0,
+  "aggs": {
+    "all_stats_unit_price": {
+      "stats": {
+        "field": "UnitPrice"
+      }
+    }
+  }
+}
+
+## Count of unique values
+Cardinality Aggregation
+The cardinality aggregation computes the count of unique values for a given field.
+GET Enter_name_of_the_index_here
+{
+  "size": 0,
+  "aggs": {
+    "Name your aggregations here": {
+      "cardinality": {
+        "field": "Name the field you want to aggregate on here"
+      }
+    }
+  }
+}
+
+GET ecommerce_data/_search
+{
+  "size": 0,
+  "aggs": {
+    "number_unique_customers": {
+      "cardinality": {
+        "field": "CustomerID"
+      }
+    }
+  }
+}
+
+
