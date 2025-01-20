@@ -445,7 +445,7 @@ GET news_headlines/_search
 - see
 https://github.com/LisaHJung/Part-3-Running-full-text-queries-and-combined-queries-with-Elasticsearch-and-Kibana?tab=readme-ov-file#full-text-queries
 
-## mproving precision with phrase type match
+## improving precision with phrase type match
 You can improve the precision of a multi_match query by adding the "type":"phrase" to the query.
 
 The phrase type performs a match_phrase query on each field and calculates a score for each field. Then, it assigns the highest score among the fields to the document.
@@ -482,3 +482,284 @@ GET news_headlines/_search
 }
 
 The recall is much lower(6 vs 2846 hits) but every one of the hits have the phrase "party planning" in either the field headline or short_description or both.
+
+# Combined Queries
+There will be times when a user asks a multi-faceted question that requires multiple queries to answer.
+
+For example, a user may want to find political headlines about Michelle Obama published before the year 2016.
+
+This search is actually a combination of three queries:
+
+Query headlines that contain the search terms "Michelle Obama" in the field headline.
+Query "Michelle Obama" headlines from the "POLITICS" category.
+Query "Michelle Obama" headlines published before the year 2016
+One of the ways you can combine these queries is through a bool query.
+
+The bool query retrieves documents matching boolean combinations of other queries.
+
+With the bool query, you can combine multiple queries into one request and further specify boolean clauses to narrow down your search results.
+
+There are four clauses to choose from:
+
+must
+must_not
+should
+filter
+
+GET name_of_index/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {One or more queries can be specified here. A document MUST match all of these queries to be considered as a hit.}
+      ],
+      "must_not": [
+        {A document must NOT match any of the queries specified here. It it does, it is excluded from the search results.}
+      ],
+      "should": [
+        {A document does not have to match any queries specified here. However, it if it does match, this document is given a higher score.}
+      ],
+      "filter": [
+        {These filters(queries) place documents in either yes or no category. Ones that fall into the yes category are included in the hits. }
+      ]
+    }
+  }
+}
+
+## A combination of query and aggregation request
+
+A bool query can help you answer multi-faceted questions. Before we go over the four clauses of the bool query, we need to first understand what type of questions we can ask about Michelle Obama.
+
+Let's first figure out what headlines have been written about her.
+
+One way to understand that is by searching for categories of headlines that mention Michelle Obama.
+
+Syntax:
+GET Enter_name_of_the_index_here/_search
+{
+  "query": {
+    "Enter match or match_phrase here": { "Enter the name of the field": "Enter the value you are looking for" }
+  },
+  "aggregations": {
+    "Name your aggregation here": {
+      "Specify aggregation type here": {
+        "field": "Name the field you want to aggregate here",
+        "size": State how many buckets you want returned here
+      }
+    }
+  }
+}
+
+The following query ask Elasticsearch to query all data that has the phrase "Michelle Obama" in the headline. Then, perform aggregations on the queried data and retrieve up to 100 categories that exist in the queried data.
+
+GET news_headlines/_search
+{
+  "query": {
+    "match_phrase": {
+      "headline": "Michelle Obama"
+    }
+  },
+  "aggregations": {
+    "category_mentions": {
+      "terms": {
+        "field": "category",
+        "size": 100
+      }
+    }
+  }
+}
+
+## Must query
+GET Enter_name_of_the_index_here/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+        "Enter match or match_phrase here": {
+          "Enter the name of the field": "Enter the value you are looking for" 
+         }
+        },
+        {
+          "Enter match or match_phrase here": {
+            "Enter the name of the field": "Enter the value you are looking for" 
+          }
+        }
+      ]
+    }
+  }
+}
+
+The following is a bool query that uses the must clause. This query specifies that all hits must match the phrase "Michelle Obama" in the field headline and match the term "POLITICS" in the field category.
+
+GET news_headlines/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+        "match_phrase": {
+          "headline": "Michelle Obama"
+         }
+        },
+        {
+          "match": {
+            "category": "POLITICS"
+          }
+        }
+      ]
+    }
+  }
+}
+
+
+# The must_not clause
+The must_not clause defines queries(criteria) a document MUST NOT match to be included in the search results.
+GET Enter_name_of_the_index_here/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+        "Enter match or match_phrase here": {
+          "Enter the name of the field": "Enter the value you are looking for" 
+         }
+        },
+       "must_not":[
+         {
+          "Enter match or match_phrase here": {
+            "Enter the name of the field": "Enter the value you are looking for"
+          }
+        }
+      ]
+    }
+  }
+}
+
+
+want all Michelle Obama headlines except for the ones that belong in the "WEDDINGS" category?
+
+The following bool query specifies that all hits must contain the phrase "Michelle Obama" in the field headline. However, the hits must_not contain the term "WEDDINGS" in the field category
+
+GET news_headlines/_search
+{
+  "query": {
+    "bool": {
+      "must": {
+        "match_phrase": {
+          "headline": "Michelle Obama"
+         }
+        },
+       "must_not":[
+         {
+          "match": {
+            "category": "WEDDINGS"
+          }
+        }
+      ]
+    }
+  }
+}
+
+# should clause 
+The should clause adds "nice to have" queries(criteria). The documents do not need to match the "nice to have" queries to be considered as hits. However, the ones that do will be given a higher score so it shows up higher in the search results.
+
+GET Enter_name_of_the_index_here/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+        "Enter match or match_phrase here: {
+          "Enter the name of the field": "Enter the value you are looking for" 
+         }
+        },
+       "should":[
+         {
+          "Enter match or match_phrase here": {
+            "Enter the name of the field": "Enter the value you are looking for"
+          }
+        }
+      ]
+    }
+  }
+
+  GET news_headlines/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+        "match_phrase": {
+          "headline": "Michelle Obama"
+          }
+         }
+        ],
+       "should":[
+         {
+          "match_phrase": {
+            "category": "BLACK VOICES"
+          }
+        }
+      ]
+    }
+  }
+}
+
+
+## Filter clause
+The filter clause contains filter queries that place documents into either "yes" or "no" category.
+
+For example, let's say you are looking for headlines published within a certain time range. Some documents will fall within this range(yes) or do not fall within this range(no).
+
+The filter clause only includes documents that fall into the yes category.
+
+
+GET Enter_name_of_the_index_here/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+        "Enter match or match_phrase here": {
+          "Enter the name of the field": "Enter the value you are looking for" 
+         }
+        }
+        ],
+       "filter":{
+          "range":{
+             "date": {
+               "gte": "Enter lowest value of the range here",
+               "lte": "Enter highest value of the range here"
+          }
+        }
+      }
+    }
+  }
+}
+
+
+GET news_headlines/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+        "match_phrase": {
+          "headline": "Michelle Obama"
+          }
+         }
+        ],
+       "filter":{
+          "range":{
+             "date": {
+               "gte": "2014-03-25",
+               "lte": "2016-03-25"
+          }
+        }
+      }
+    }
+  }
+}
+
+## Aggregation

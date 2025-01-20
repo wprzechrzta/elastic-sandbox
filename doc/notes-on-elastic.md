@@ -132,3 +132,31 @@ precision - want less results but good matched
 recall - get more results, exact match is not important
 
 https://github.com/LisaHJung/Part-2-Understanding-the-relevance-of-your-search-with-Elasticsearch-and-Kibana-?tab=readme-ov-file#precision-and-recall
+
+
+# Combined Queries
+There will be times when a user asks a multi-faceted question that requires multiple queries to answer.
+
+For example, a user may want to find political headlines about Michelle Obama published before the year 2016.
+
+This search is actually a combination of three queries:
+
+Query headlines that contain the search terms "Michelle Obama" in the field headline.
+Query "Michelle Obama" headlines from the "POLITICS" category.
+Query "Michelle Obama" headlines published before the year 2016
+One of the ways you can combine these queries is through a bool query.
+
+Bool Query
+The bool query retrieves documents matching boolean combinations of other queries.
+
+With the bool query, you can combine multiple queries into one request and further specify boolean clauses to narrow down your search results.
+
+There are four clauses to choose from:
+
+- must
+- must_not
+- should
+- filter
+You can build combinations of one or more of these clauses. Each clause can contain one or multiple queries that specify the criteria of each clause.
+
+These clauses are optional and can be mixed and matched to cater to your use case. The order in which they appear does not matter either!
