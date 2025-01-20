@@ -907,3 +907,153 @@ GET ecommerce_data/_search
 }
 
 
+## Bucket aggregations
+https://www.youtube.com/watch?v=iDaAW3__hb8&list=PL_mJOmq4zsHbcdoeAwNWuhEWwDARMMBta&index=14
+
+Limiting the scope of an aggregation
+
+In the previous examples, aggregations were performed on all documents in the ecommerce_data index. What if you want to run an aggregation on a subset of the documents?
+
+For example, our index contains e-commerce data from multiple countries. Let's say you want to calculate the average unit price of items sold in Germany.
+
+To limit the scope of the aggregation, you can add a query clause to the aggregations request. The query clause defines the subset of documents that aggregations should be performed on.
+
+The combined query and aggregations look like the following.
+
+GET Enter_name_of_the_index_here/_search
+{
+  "size": 0,
+  "query": {
+    "Enter match or match_phrase here": {
+      "Enter the name of the field": "Enter the value you are looking for"
+    }
+  },
+  "aggregations": {
+    "Name your aggregations here": {
+      "Specify aggregations type here": {
+        "field": "Name the field you want to aggregate here"
+      }
+    }
+  }
+}
+
+GET ecommerce_data/_search
+{
+  "size": 0,
+  "query": {
+    "match": {
+      "Country": "Germany"
+    }
+  },
+  "aggs": {
+    "germany_average_unit_price": {
+      "avg": {
+        "field": "UnitPrice"
+      }
+    }
+  }
+}
+
+# Bucket Aggregations
+Bucket aggregations group documents into several sets of documents called buckets. All documents in a bucket share a common criteria.
+
+The following are different types of bucket aggregations.
+
+- Date Histogram Aggregation
+- Histogram Aggregation
+- Range Aggregation
+- Terms aggregation
+
+# Date Histogram Aggregation
+When you are looking to group data by time interval, the date_histogram aggregation will prove very useful!
+
+Our ecommerce_data index contains transaction data that has been collected over time(from the year 2010 to 2011).
+
+- Fixed_interval With the fixed_interval, the interval is always constant.
+  GET ecommerce_data/_search
+{
+  "size": 0,
+  "aggs": {
+    "Name your aggregations here": {
+      "date_histogram": {
+        "field":"Name the field you want to aggregate on here",
+        "fixed_interval": "Specify the interval here"
+      }
+    }
+  }
+}
+
+- it will count docs in 8h buckets
+
+GET ecommerce_data/_search
+{
+  "size": 0,
+  "aggs": {
+    "transactions_by_8_hrs": {
+      "date_histogram": {
+        "field": "InvoiceDate",
+        "fixed_interval": "8h"
+      }
+    }
+  }
+}
+
+# Calendar intervals
+
+For example, we could choose a time interval of day, month or year. But daylight savings can change the length of specific days, months can have different number of days, and leap seconds can be tacked onto a particular year.
+
+So the time interval of day, month, or leap seconds could vary!
+
+A scenario where you might use the calendar_interval is when you want to calculate the monthly revenue.
+
+Ex. Split data into monthly buckets.
+
+GET ecommerce_data/_search
+{
+  "size": 0,
+  "aggs": {
+    "Name your aggregations here": {
+      "date_histogram": {
+        "field":"Name the field you want to aggregate on here",
+        "calendar_interval": "Specify the interval here"
+      }
+    }
+  }
+}
+
+GET ecommerce_data_new/_search
+{
+  "size": 0,
+  "aggs": {
+    "transactions_by_month": {
+      "date_histogram": {
+        "field": "InvoiceDate",
+        "calendar_interval": "1M"
+      }
+    }
+  }
+}
+
+
+## Bucket sorting for date histogram aggregation
+y default, the date_histogram aggregation sorts buckets based on the "key" values in ascending order.
+
+To reverse this order, you can add an order parameter to the aggregations as shown below. Then, specify that you want to sort buckets based on the "_key" values in descending(desc) order
+
+GET ecommerce_data/_search
+{
+  "size": 0,
+  "aggs": {
+    "transactions_by_month": {
+      "date_histogram": {
+        "field": "InvoiceDate",
+        "calendar_interval": "1M",
+        "order": {
+          "_key": "desc"
+        }
+      }
+    }
+  }
+}
+
+## Combinataion of aggretation
